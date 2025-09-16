@@ -1,15 +1,18 @@
 version: '3.8'
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     restart: unless-stopped
     volumes:
       - .:/app
       - /app/node_modules
+    command: ["npx", "nodemon", "--legacy-watch", "--watch", "src", "--exec", "npm run start:dev"]
     depends_on:
       - postgres
       - redis
