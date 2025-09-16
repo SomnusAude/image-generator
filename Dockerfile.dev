@@ -9,6 +9,9 @@ RUN npm ci && npm install --save-dev nodemon && npm i -g @nestjs/cli
 
 COPY . .
 
+RUN npx prisma generate
+
+
 EXPOSE 3000
 
 CMD ["npx", "nodemon", "--legacy-watch", "--watch", "src", "--exec", "npm run start:dev"]

@@ -14,6 +14,9 @@ RUN npm i -g @nestjs/cli
 # Копируем исходный код
 COPY . .
 
+RUN npx prisma generate
+
+
 # Собираем TypeScript (если требуется)
 RUN npm run build
 
