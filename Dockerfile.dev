@@ -5,7 +5,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci && npm install --save-dev nodemon && npm i -g @nestjs/cli
+RUN npm ci
+RUN npm install --save-dev nodemon
+RUN npm i -g @nestjs/cli
 
 COPY . .
 

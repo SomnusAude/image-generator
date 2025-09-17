@@ -49,6 +49,7 @@ export class FusionBrainApiService {
         form.append('pipeline_id', pipelineId)
         form.append('params', JSON.stringify(params), { contentType: 'application/json' })
 
+        // TODO: переписать на fetch
         try {
             const response = await axios.post(url, form, {
                 headers: {
