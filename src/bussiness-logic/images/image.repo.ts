@@ -31,20 +31,14 @@ export class ImageRepository {
 
     // Other methods
 
-    async getImages(args: {
-        skip?: number
-        take?: number
-        cursor?: Prisma.ImageWhereUniqueInput
-        where?: Prisma.ImageWhereInput
-        orderBy?: Prisma.ImageOrderByWithRelationInput
-    }): Promise<Image.BaseType[]> {
-        const { skip, take, cursor, where, orderBy } = args
+    async getAllImages(args: { page?: number; pageSize?: number }): Promise<Image.BaseType[]> {
+        const page = args.page && args.page > 0 ? args.page : 1
+        const pageSize = args.pageSize && args.pageSize > 0 ? args.pageSize : 10
+        const skip = (page - 1) * pageSize
         return this.prisma.image.findMany({
             skip,
-            take,
-            cursor,
-            where,
-            orderBy,
+            take: pageSize,
+            orderBy: { createdAt: 'desc' },
         })
     }
 }
