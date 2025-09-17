@@ -19,6 +19,7 @@ model Image {
   prompt       String
   style        String
   status       Status   @default(pending)
+  uuid         String   @default("")
   originalUrl  String?
   thumbnailUrl String?
   createdAt    DateTime @default(now())
@@ -26,6 +27,7 @@ model Image {
 }
 
 enum Status {
+  created
   pending
   done
   error

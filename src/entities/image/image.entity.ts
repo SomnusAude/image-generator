@@ -9,7 +9,8 @@ export namespace _ImageEntity {
         id: string
         prompt: string
         style: string
-        status: 'pending' | 'done' | 'error'
+        uuid: string
+        status: 'created' | 'pending' | 'done' | 'error'
         originalUrl: string | null
         thumbnailUrl: string | null
         createdAt: Date
