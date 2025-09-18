@@ -68,24 +68,6 @@ docker-compose build --no-cache
 docker-compose up
 ```
 
-## Структура проекта
-
-src/
-├─ app/
-│ └─ app.module.ts # Корневой модуль приложения
-├─ business-logic/ # Основная бизнес-логика
-│ ├─ fusion-brain-api/ # Клиент для внешнего API Fusion Brain
-│ ├─ images/ # Контроллеры и репозитории изображений
-│ ├─ minio/ # Репозиторий для работы с MinIO
-│ ├─ prisma/ # ORM и миграции
-│ ├─ queue/ # Логика очереди Redis
-│ └─ worker/ # Воркеры и Cron-сервис
-├─ common/ # Общие утилиты и вспомогательные элементы
-│ ├─ filters/ # Прокидывание uuid в случае ошибок
-│ └─ interceptors/ # Прокидывание uuid
-└─ entities/ # Сущности
-└─ image/ # Entity для изображений
-
 ## Примечания
 
 • Проект выполнен в качестве тестового задания, не для продакшена
