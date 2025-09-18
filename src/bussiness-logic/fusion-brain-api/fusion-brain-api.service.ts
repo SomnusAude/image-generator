@@ -57,6 +57,7 @@ export class FusionBrainApiService {
                     ...form.getHeaders(),
                 },
             })
+            // console.log(JSON.stringify(response))
             return response.data['uuid']
         } catch {
             throw new InternalServerErrorException('Failed from Fusion Brain API')
@@ -71,10 +72,13 @@ export class FusionBrainApiService {
         }
         try {
             const response = await axios.get(url, { headers: headers })
+            console.log(JSON.stringify(response))
             if (response.data['status'] === 'DONE') return response.data['result']['files']
             return null
-        } catch {
-            throw new InternalServerErrorException('Failed from Fusion Brain API')
+        } catch (error) {
+            throw new InternalServerErrorException(
+                `Failed from Fusion Brain API\n${JSON.stringify(error)}`
+            )
         }
     }
 }

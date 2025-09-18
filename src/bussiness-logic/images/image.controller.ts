@@ -122,11 +122,16 @@ export class ImageController {
         }
         const { page, pageSize } = parseResult.data
         const images = await this.repo.getAllImages({ page, pageSize })
-        return images.map(async (img) => ({
-            id: img.id,
-            thumbnailUrl: img.thumbnailUrl
+        const result: { id: string; thumbnailUrl: string | null }[] = []
+        images.forEach(async (img) => {
+            const thumbnailUrl = img.thumbnailUrl
                 ? await this.minioRepo.getPresignedUrl(img.thumbnailUrl)
-                : null,
-        }))
+                : null
+            result.push({
+                id: img.id,
+                thumbnailUrl: thumbnailUrl,
+            })
+        })
+        return result
     }
 }

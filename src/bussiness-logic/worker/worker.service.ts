@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Cron, CronExpression } from '@nestjs/schedule'
+import { Cron } from '@nestjs/schedule'
 import { Jimp } from 'jimp'
 import { Image } from 'src/entities/image'
 import { FusionBrainApiService } from '../fusion-brain-api/fusion-brain-api.service'
@@ -19,25 +19,26 @@ export class WorkerService {
         private readonly minioRepo: MinioRepository
     ) {}
 
-    @Cron(CronExpression.EVERY_10_SECONDS)
+    @Cron('*/10 * * * * *')
     async handleCron() {
         if (this.isProcessing) {
             this.logger.warn('Previous batch still processing, skipping this tick')
             return
         }
         this.isProcessing = true
-        try {
-            while (true) {
-                const task = await this.queueService.dequeue(1)
-                if (!task) break
+        const batchSize = await this.queueService.getQueueLength()
+        console.log(`Start cron task, found ${batchSize} items in queue`)
+        for (let i = 0; i < batchSize; i++) {
+            const task = await this.queueService.dequeue(1)
+            if (!task) continue
+            try {
                 this.logger.log(`Processing task: ${JSON.stringify(task)}`)
                 await this.executeTask(task)
+            } catch (error) {
+                this.logger.error('Error processing task', error)
             }
-        } catch (error) {
-            this.logger.error('Error processing batch', error)
-        } finally {
-            this.isProcessing = false
         }
+        this.isProcessing = false
     }
 
     private async executeTask(task: Image.BaseType) {
@@ -60,7 +61,7 @@ export class WorkerService {
                     await this.queueService.enqueue(task)
                     return
                 }
-                const buffer = Buffer.from(imageRaw, 'base64')
+                const buffer = Buffer.from(imageRaw.replace(/\s/g, ''), 'base64')
                 const originalId = await this.minioRepo.uploadObject(`${task.id}_original`, buffer)
                 const thumbnailBuffer = await this.createThumbnail(buffer)
                 const thumbnailId = await this.minioRepo.uploadObject(
@@ -81,6 +82,7 @@ export class WorkerService {
     }
 
     private async createThumbnail(buffer: Buffer): Promise<Buffer> {
+        this.logger.log('Start cropping img')
         const image = await Jimp.read(buffer)
         image.resize({ w: 128, h: 128 })
         return await image.getBuffer('image/png')

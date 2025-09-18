@@ -22,6 +22,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
     async enqueue(task: Image.BaseType): Promise<void> {
         await this.redis.rpush(this.queueName, JSON.stringify(task))
+        console.log('Task was pushed into queue')
     }
 
     async dequeue(timeout = 0): Promise<Image.BaseType | null> {
