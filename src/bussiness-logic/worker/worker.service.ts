@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import sharp from 'sharp'
+import { Jimp } from 'jimp'
 import { Image } from 'src/entities/image'
 import { FusionBrainApiService } from '../fusion-brain-api/fusion-brain-api.service'
 import { ImageRepository } from '../images/image.repo'
@@ -80,13 +80,9 @@ export class WorkerService {
         }
     }
 
-    private async createThumbnail(originalBuffer: Buffer): Promise<Buffer> {
-        return sharp(originalBuffer)
-            .resize(128, 128, {
-                fit: 'cover',
-                position: 'centre',
-            })
-            .webp({ quality: 80 })
-            .toBuffer()
+    private async createThumbnail(buffer: Buffer): Promise<Buffer> {
+        const image = await Jimp.read(buffer)
+        image.resize({ w: 128, h: 128 })
+        return await image.getBuffer('image/png')
     }
 }
