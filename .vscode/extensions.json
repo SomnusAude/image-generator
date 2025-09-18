@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "wmaurer.change-case",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ebenezerdon.npm-studio",
+        "streetsidesoftware.code-spell-checker",
+        "streetsidesoftware.code-spell-checker-russian"
+    ]
+}
