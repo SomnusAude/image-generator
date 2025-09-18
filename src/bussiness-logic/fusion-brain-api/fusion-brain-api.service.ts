@@ -7,11 +7,11 @@ export class FusionBrainApiService {
     constructor() {}
     // https://fusionbrain.ai/docs/doc/api-dokumentaciya/
 
-    baseUrl = process.env.FUSION_BRAIN_URL
-    xKey = process.env.FUSION_BRAIN_KEY
-    xSecret = process.env.FUSION_BRAIN_SECRET
+    private baseUrl = process.env.FUSION_BRAIN_URL
+    private xKey = process.env.FUSION_BRAIN_KEY
+    private xSecret = process.env.FUSION_BRAIN_SECRET
 
-    async getPipeline(): Promise<string> {
+    private async getPipeline(): Promise<string> {
         const url = `${this.baseUrl}key/api/v1/pipelines`
         try {
             const response = await axios.get(url, {
@@ -28,7 +28,7 @@ export class FusionBrainApiService {
         }
     }
 
-    async generate(prompt: string, style: string) {
+    async generate(prompt: string, style: string): Promise<string> {
         const url = `${this.baseUrl}key/api/v1/pipeline/run`
         const pipelineId = await this.getPipeline()
         const headers = {

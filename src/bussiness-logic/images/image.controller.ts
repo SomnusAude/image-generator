@@ -11,12 +11,18 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
+import { MinioRepository } from '../minio/minio.repo'
+import { QueueService } from '../queue/queue.service'
 import { ImageRepository } from './image.repo'
 
 @ApiTags('Image')
 @Controller('image')
 export class ImageController {
-    constructor(private readonly repo: ImageRepository) {}
+    constructor(
+        private readonly repo: ImageRepository,
+        private readonly queue: QueueService,
+        private readonly minioRepo: MinioRepository
+    ) {}
 
     @Post('create')
     @HttpCode(HttpStatus.OK)
@@ -45,7 +51,8 @@ export class ImageController {
             throw new BadRequestException(parseResult.error.issues.map((e) => e.message).join(', '))
         }
         const { prompt, style } = parseResult.data
-        const image = await this.repo.createImage({ prompt, style })
+        const image = await this.repo.createImage({ prompt, style, status: 'created' })
+        await this.queue.enqueue(image)
         return image.id
     }
 
@@ -73,11 +80,15 @@ export class ImageController {
         if (!image) {
             throw new BadRequestException('Image not found')
         }
-        if (!image.originalUrl && !image.thumbnailUrl) {
+        if (!image.originalUrl || !image.thumbnailUrl) {
             throw new HttpException('Image is still being generated', HttpStatus.ACCEPTED)
         }
-        return {
-            url: type === 'original' ? image.originalUrl : image.thumbnailUrl,
+        switch (type) {
+            case 'original':
+                return await this.minioRepo.getPresignedUrl(image.originalUrl)
+
+            case 'thumbnail':
+                return await this.minioRepo.getPresignedUrl(image.thumbnailUrl)
         }
     }
 
@@ -111,9 +122,11 @@ export class ImageController {
         }
         const { page, pageSize } = parseResult.data
         const images = await this.repo.getAllImages({ page, pageSize })
-        return images.map((img) => ({
+        return images.map(async (img) => ({
             id: img.id,
-            thumbnailUrl: img.thumbnailUrl,
+            thumbnailUrl: img.thumbnailUrl
+                ? await this.minioRepo.getPresignedUrl(img.thumbnailUrl)
+                : null,
         }))
     }
 }
