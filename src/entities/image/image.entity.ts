@@ -11,8 +11,8 @@ export namespace _ImageEntity {
         style: string
         uuid: string
         status: 'created' | 'pending' | 'done' | 'error'
-        originalUrl: string | null
-        thumbnailUrl: string | null
+        originalId: string | null
+        thumbnailId: string | null
         createdAt: Date
         updatedAt: Date
     }

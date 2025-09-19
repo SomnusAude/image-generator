@@ -80,15 +80,15 @@ export class ImageController {
         if (!image) {
             throw new BadRequestException('Image not found')
         }
-        if (!image.originalUrl || !image.thumbnailUrl) {
+        if (!image.originalId || !image.thumbnailId) {
             throw new HttpException('Image is still being generated', HttpStatus.ACCEPTED)
         }
         switch (type) {
             case 'original':
-                return await this.minioRepo.getPresignedUrl(image.originalUrl)
+                return await this.minioRepo.getPresignedUrl(image.originalId)
 
             case 'thumbnail':
-                return await this.minioRepo.getPresignedUrl(image.thumbnailUrl)
+                return await this.minioRepo.getPresignedUrl(image.thumbnailId)
         }
     }
 
@@ -124,8 +124,8 @@ export class ImageController {
         const images = await this.repo.getAllImages({ page, pageSize })
         const result: { id: string; thumbnailUrl: string | null }[] = []
         images.forEach(async (img) => {
-            const thumbnailUrl = img.thumbnailUrl
-                ? await this.minioRepo.getPresignedUrl(img.thumbnailUrl)
+            const thumbnailUrl = img.thumbnailId
+                ? await this.minioRepo.getPresignedUrl(img.thumbnailId)
                 : null
             result.push({
                 id: img.id,
