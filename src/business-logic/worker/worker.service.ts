@@ -35,7 +35,8 @@ export class WorkerService {
                 this.logger.log(`Processing task: ${JSON.stringify(task)}`)
                 await this.executeTask(task)
             } catch (error) {
-                this.logger.error('Error processing task', error)
+                this.logger.error('Error executing task', error)
+                await this.queueService.enqueue(task)
             }
         }
         this.isProcessing = false
@@ -70,7 +71,7 @@ export class WorkerService {
                 )
                 await this.imageRepo.updateImage({
                     where: { id: task.id },
-                    data: { status: 'done', originalUrl: originalId, thumbnailUrl: thumbnailId },
+                    data: { status: 'done', originalId: originalId, thumbnailId: thumbnailId },
                 })
                 return
             }

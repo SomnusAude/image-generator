@@ -15,15 +15,15 @@ datasource db {
 }
 
 model Image {
-  id           String   @id @default(cuid())
-  prompt       String
-  style        String
-  status       Status   @default(pending)
-  uuid         String   @default("")
-  originalUrl  String?
-  thumbnailUrl String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  prompt      String
+  style       String
+  status      Status   @default(pending)
+  uuid        String   @default("")
+  originalId  String?  @map("originalUrl")
+  thumbnailId String?  @map("thumbnailUrl")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Status {
